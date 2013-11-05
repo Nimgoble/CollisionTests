@@ -25,10 +25,13 @@ namespace TestDrawingApp
                 _window = new RenderWindow(new VideoMode(800, 600), "SFML window");
                 _window.SetVisible(true);
                 _window.Closed += new EventHandler(OnClosed);
+
+                Tests tests = new Tests(_window);
                 while (_window.IsOpen())
                 {
                     _window.DispatchEvents();
-                    _window.Clear(Color.Red);
+                    _window.Clear();
+                    tests.TestAABBProjectionList();
                     _window.Display();
                 }
             }

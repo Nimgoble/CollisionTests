@@ -3,12 +3,14 @@ using System.Data;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace CollisionLib
 {
-    public class LineSegment
+    public class LineSegment : SFML.Graphics.Drawable
     {
         private static float MyEpsilon = 0.00001f;
+        private VertexArray linePoints;
 
         public SFML.Window.Vector2f Start { get; set; }
         public SFML.Window.Vector2f End { get; set; }
@@ -23,12 +25,38 @@ namespace CollisionLib
         {
             Start = start;
             End = end;
+
+            linePoints = new VertexArray(PrimitiveType.Lines);
+            linePoints.Append(new Vertex(start));
+            linePoints.Append(new Vertex(end));
+        }
+
+        public LineSegment(SFML.Window.Vector2f start, SFML.Window.Vector2f end, SFML.Graphics.Color color)
+        {
+            Start = start;
+            End = end;
+
+            linePoints = new VertexArray(PrimitiveType.Lines);
+            linePoints.Append(new Vertex(start) { Color = color });
+            linePoints.Append(new Vertex(end) { Color = color });
+        }
+
+        public void SetColor(SFML.Graphics.Color color)
+        {
+            linePoints.Clear();
+            linePoints.Append(new Vertex(Start) { Color = color });
+            linePoints.Append(new Vertex(End) { Color = color });
         }
 
         public bool CollidesWith(LineSegment other, out SFML.Window.Vector2f[] collisionPoints)
         {
             collisionPoints = Intersection(Start, End, other.Start, other.End);
             return collisionPoints.Length > 0;
+        }
+
+        public void Draw(RenderTarget target, RenderStates states)
+        {
+            target.Draw(linePoints, states);
         }
 
         #region Intersection stuff
