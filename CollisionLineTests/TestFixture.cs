@@ -83,8 +83,8 @@ namespace CollisionLineTests
             AABBProjection projection1 = new AABBProjection(box1, new SFML.Window.Vector2f(30.0f, -30.0f));
             AABBProjection projection2 = new AABBProjection(box2, new SFML.Window.Vector2f(30.0f, 30.0f));
 
-            Dictionary<AABBProjection.AABBProjectionSegment, 
-                    Dictionary<AABBProjection.AABBProjectionSegment, 
+            Dictionary<AABBProjection.AABBProjectionSegmentEnum, 
+                    Dictionary<AABBProjection.AABBProjectionSegmentEnum, 
                         List<SFML.Window.Vector2f>>> results = null;
 
             bool collisions = projection1.CollidesWith(projection2, out results);

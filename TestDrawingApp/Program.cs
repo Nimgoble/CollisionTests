@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using SFML;
@@ -26,18 +27,62 @@ namespace TestDrawingApp
                 _window.SetVisible(true);
                 _window.Closed += new EventHandler(OnClosed);
 
-                Tests tests = new Tests(_window);
+                tests = new Tests(_window);
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
                 while (_window.IsOpen())
                 {
                     _window.DispatchEvents();
                     _window.Clear();
-                    tests.TestAABBProjectionList();
+
+                    if (watch.ElapsedMilliseconds > 500)
+                    {
+                        if (SFML.Window.Keyboard.IsKeyPressed(Keyboard.Key.Left) && currentTest > 0)
+                        {
+                            --currentTest;
+                            watch.Reset();
+                            watch.Start();
+                        }
+                        else if (SFML.Window.Keyboard.IsKeyPressed(Keyboard.Key.Right) && currentTest < 5)
+                        {
+                            ++currentTest;
+                            watch.Reset();
+                            watch.Start();
+                        }
+                    }
+
+                    RunCurrentTest();
+
                     _window.Display();
                 }
             }
             void OnClosed(object sender, EventArgs e)
             {
                 _window.Close();
+            }
+
+            private Int32 currentTest = 0;
+            private Tests tests;
+            private void RunCurrentTest()
+            {
+                switch (currentTest)
+                {
+                    case 0:
+                        tests.AABBProjectionTestA();
+                        break;
+                    case 1:
+                        tests.AABBProjectionTestB();
+                        break;
+                    case 2:
+                        tests.AABBProjectionTestC();
+                        break;
+                    case 3:
+                        tests.AABBProjectionTestD();
+                        break;
+                    case 4:
+                        tests.AABBProjectionTestE();
+                        break;
+                }
             }
         }
     }

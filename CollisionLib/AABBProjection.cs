@@ -8,7 +8,7 @@ namespace CollisionLib
 {
     public class AABBProjection : Drawable
     {
-        public enum AABBProjectionSegment
+        public enum AABBProjectionSegmentEnum
         {
             enTopLeft = 0,
             enTopRight = 1,
@@ -16,79 +16,101 @@ namespace CollisionLib
             enBottomRight = 3
         };
 
+        public class AABBProjectionSegment
+        {
+            public AABBProjectionSegment()
+            {
+            }
+            public AABBProjectionSegment(LineSegment path, AABBProjectionSegmentEnum segmentEnum)
+            {
+                Path = path;
+                SegmentEnum = segmentEnum;
+            }
+            public LineSegment Path { get; set; }
+            public AABBProjectionSegmentEnum SegmentEnum { get; set; }
+            public AABBProjectionSegmentJoiner Next { get; set; }
+            public AABBProjectionSegmentJoiner Previous { get; set; }
+        };
+
+        public class AABBProjectionSegmentJoiner
+        {
+            public AABBProjectionSegment Segment { get; set; }
+            public AABB.AABBSide Side { get; set; }
+        }
+
         public AABB Start { get; set; }
         public AABB End { get; set; }
-        public LineSegment[] PathSegments { get; set; }
+        public Dictionary<AABBProjectionSegmentEnum, AABBProjectionSegment> PathSegments { get; set; }
 
-        public static AABBProjectionSegment[] GetAdjacentSegments(AABBProjectionSegment segment)
+        public static AABBProjectionSegmentEnum[] GetAdjacentSegments(AABBProjectionSegmentEnum segment)
         {
             switch(segment)
             {
-                case AABBProjectionSegment.enTopLeft:
+                case AABBProjectionSegmentEnum.enTopLeft:
                     {
-                        return new AABBProjectionSegment[] { AABBProjectionSegment.enTopRight, AABBProjectionSegment.enBottomLeft };
+                        return new AABBProjectionSegmentEnum[] { AABBProjectionSegmentEnum.enTopRight, AABBProjectionSegmentEnum.enBottomLeft };
                     }
-                case AABBProjectionSegment.enTopRight:
+                case AABBProjectionSegmentEnum.enTopRight:
                     {
-                        return new AABBProjectionSegment[] { AABBProjectionSegment.enTopLeft, AABBProjectionSegment.enBottomRight };
+                        return new AABBProjectionSegmentEnum[] { AABBProjectionSegmentEnum.enTopLeft, AABBProjectionSegmentEnum.enBottomRight };
                     }
-                case AABBProjectionSegment.enBottomLeft:
+                case AABBProjectionSegmentEnum.enBottomLeft:
                     {
-                        return new AABBProjectionSegment[] { AABBProjectionSegment.enTopLeft, AABBProjectionSegment.enBottomRight };
+                        return new AABBProjectionSegmentEnum[] { AABBProjectionSegmentEnum.enTopLeft, AABBProjectionSegmentEnum.enBottomRight };
                     }
-                case AABBProjectionSegment.enBottomRight:
+                case AABBProjectionSegmentEnum.enBottomRight:
                     {
-                        return new AABBProjectionSegment[] { AABBProjectionSegment.enTopRight, AABBProjectionSegment.enBottomLeft };
+                        return new AABBProjectionSegmentEnum[] { AABBProjectionSegmentEnum.enTopRight, AABBProjectionSegmentEnum.enBottomLeft };
                     }
             }           
 
             return null;
         }
 
-        public static AABB.AABBSide GetSideFromProjectionSegments(AABBProjectionSegment segment1, AABBProjectionSegment segment2)
+        public static AABB.AABBSide GetSideFromProjectionSegments(AABBProjectionSegmentEnum segment1, AABBProjectionSegmentEnum segment2)
         {
             switch (segment1)
             {
-                case AABBProjectionSegment.enTopLeft:
+                case AABBProjectionSegmentEnum.enTopLeft:
                     {
                         switch (segment2)
                         {
-                            case AABBProjectionSegment.enTopRight:
+                            case AABBProjectionSegmentEnum.enTopRight:
                                 return AABB.AABBSide.enTop;
-                            case AABBProjectionSegment.enBottomLeft:
+                            case AABBProjectionSegmentEnum.enBottomLeft:
                                 return AABB.AABBSide.enLeft;
                         }
                         break;
                     }
-                case AABBProjectionSegment.enTopRight:
+                case AABBProjectionSegmentEnum.enTopRight:
                     {
                         switch (segment2)
                         {
-                            case AABBProjectionSegment.enTopLeft:
+                            case AABBProjectionSegmentEnum.enTopLeft:
                                 return AABB.AABBSide.enTop;
-                            case AABBProjectionSegment.enBottomRight:
+                            case AABBProjectionSegmentEnum.enBottomRight:
                                 return AABB.AABBSide.enRight;
                         }
                         break;
                     }
-                case AABBProjectionSegment.enBottomLeft:
+                case AABBProjectionSegmentEnum.enBottomLeft:
                     {
                         switch (segment2)
                         {
-                            case AABBProjectionSegment.enBottomRight:
+                            case AABBProjectionSegmentEnum.enBottomRight:
                                 return AABB.AABBSide.enBottom;
-                            case AABBProjectionSegment.enTopLeft:
+                            case AABBProjectionSegmentEnum.enTopLeft:
                                 return AABB.AABBSide.enLeft;
                         }
                         break;
                     }
-                case AABBProjectionSegment.enBottomRight:
+                case AABBProjectionSegmentEnum.enBottomRight:
                     {
                         switch (segment2)
                         {
-                            case AABBProjectionSegment.enTopRight:
+                            case AABBProjectionSegmentEnum.enTopRight:
                                 return AABB.AABBSide.enRight;
-                            case AABBProjectionSegment.enBottomLeft:
+                            case AABBProjectionSegmentEnum.enBottomLeft:
                                 return AABB.AABBSide.enBottom;
                         }
                         break;
@@ -105,9 +127,9 @@ namespace CollisionLib
             set
             {
                 color = value;
-                foreach (LineSegment segment in PathSegments)
+                foreach (AABBProjectionSegment segment in PathSegments.Values)
                 {
-                    segment.SetColor(color);
+                    segment.Path.SetColor(color);
                 }
             }
         }
@@ -119,11 +141,7 @@ namespace CollisionLib
 
             this.color = Color.White;
 
-            PathSegments = new LineSegment[4];
-            PathSegments[(int)AABBProjectionSegment.enTopLeft] = new LineSegment(Start.Position, End.Position);
-            PathSegments[(int)AABBProjectionSegment.enTopRight] = new LineSegment(Start.Sides[(int)AABB.AABBSide.enRight].Start, End.Sides[(int)AABB.AABBSide.enRight].Start);
-            PathSegments[(int)AABBProjectionSegment.enBottomLeft] = new LineSegment(Start.Sides[(int)AABB.AABBSide.enLeft].Start, End.Sides[(int)AABB.AABBSide.enLeft].Start);
-            PathSegments[(int)AABBProjectionSegment.enBottomRight] = new LineSegment(Start.Sides[(int)AABB.AABBSide.enBottom].Start, End.Sides[(int)AABB.AABBSide.enBottom].Start);
+            InitializeSegments();
         }
 
         public AABBProjection(AABB start, SFML.Window.Vector2f movement, SFML.Graphics.Color color)
@@ -133,24 +151,46 @@ namespace CollisionLib
 
             this.color = color;
 
-            PathSegments = new LineSegment[4];
-            PathSegments[(int)AABBProjectionSegment.enTopLeft] = new LineSegment(Start.Position, End.Position, color);
-            PathSegments[(int)AABBProjectionSegment.enTopRight] = new LineSegment(Start.Sides[(int)AABB.AABBSide.enRight].Start, End.Sides[(int)AABB.AABBSide.enRight].Start, color);
-            PathSegments[(int)AABBProjectionSegment.enBottomLeft] = new LineSegment(Start.Sides[(int)AABB.AABBSide.enLeft].Start, End.Sides[(int)AABB.AABBSide.enLeft].Start, color);
-            PathSegments[(int)AABBProjectionSegment.enBottomRight] = new LineSegment(Start.Sides[(int)AABB.AABBSide.enBottom].Start, End.Sides[(int)AABB.AABBSide.enBottom].Start, color);
+            InitializeSegments();
         }
 
-        /*public class ProjectionCollisionResult
+        private void InitializeSegments()
         {
-            public SFML.Window.Vector2f CollisionPoint { get; set; }
-            public AABBProjectionSegment 
-        }*/
+            PathSegments = new Dictionary<AABBProjectionSegmentEnum, AABBProjectionSegment>();
+
+            PathSegments[AABBProjectionSegmentEnum.enTopLeft] = new AABBProjectionSegment(new LineSegment(Start.Position, End.Position, Color),
+                                                                                                AABBProjectionSegmentEnum.enTopLeft);
+            PathSegments[AABBProjectionSegmentEnum.enTopRight] = new AABBProjectionSegment(new LineSegment(Start.Sides[(int)AABB.AABBSide.enRight].Start,
+                                                                                                                End.Sides[(int)AABB.AABBSide.enRight].Start,
+                                                                                                                Color),
+                                                                                                AABBProjectionSegmentEnum.enTopRight);
+            PathSegments[AABBProjectionSegmentEnum.enBottomLeft] = new AABBProjectionSegment(new LineSegment(Start.Sides[(int)AABB.AABBSide.enLeft].Start,
+                                                                                                                    End.Sides[(int)AABB.AABBSide.enLeft].Start,
+                                                                                                                    Color),
+                                                                                                    AABBProjectionSegmentEnum.enBottomLeft);
+            PathSegments[AABBProjectionSegmentEnum.enBottomRight] = new AABBProjectionSegment(new LineSegment(Start.Sides[(int)AABB.AABBSide.enBottom].Start,
+                                                                                                                    End.Sides[(int)AABB.AABBSide.enBottom].Start,
+                                                                                                                    Color),
+                                                                                                    AABBProjectionSegmentEnum.enBottomRight);
+
+            PathSegments[AABBProjectionSegmentEnum.enTopLeft].Next = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enTopRight], Side = AABB.AABBSide.enTop };
+            PathSegments[AABBProjectionSegmentEnum.enTopLeft].Previous = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enBottomLeft], Side = AABB.AABBSide.enLeft };
+
+            PathSegments[AABBProjectionSegmentEnum.enTopRight].Next = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enBottomRight], Side = AABB.AABBSide.enRight };
+            PathSegments[AABBProjectionSegmentEnum.enTopRight].Previous = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enTopLeft], Side = AABB.AABBSide.enTop };
+
+            PathSegments[AABBProjectionSegmentEnum.enBottomRight].Next = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enBottomLeft], Side = AABB.AABBSide.enBottom};
+            PathSegments[AABBProjectionSegmentEnum.enBottomRight].Previous = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enTopRight], Side = AABB.AABBSide.enRight };
+
+            PathSegments[AABBProjectionSegmentEnum.enBottomLeft].Next = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enTopLeft], Side = AABB.AABBSide.enLeft };
+            PathSegments[AABBProjectionSegmentEnum.enBottomLeft].Previous = new AABBProjectionSegmentJoiner() { Segment = PathSegments[AABBProjectionSegmentEnum.enBottomRight], Side = AABB.AABBSide.enBottom };
+        }
 
         public class AABBProjectionCollisionResult : Drawable
         {
             private CollisionLib.Shapes.XShape xshape;
-            public AABBProjectionSegment LocalSide { get; set; }
-            public AABBProjectionSegment OtherSide { get; set; }
+            public AABBProjectionSegmentEnum LocalSide { get; set; }
+            public AABBProjectionSegmentEnum OtherSide { get; set; }
             public float Length { get; set; }
             private SFML.Window.Vector2f collisionPoint;
             public SFML.Window.Vector2f CollisionPoint 
@@ -169,28 +209,27 @@ namespace CollisionLib
             }
         }
 
-        public bool CollidesWith(AABBProjection other, out Dictionary<AABBProjectionSegment, Dictionary<AABBProjectionSegment, List<SFML.Window.Vector2f>>> results)
+        public bool CollidesWith(AABBProjection other, out Dictionary<AABBProjectionSegmentEnum, Dictionary<AABBProjectionSegmentEnum, List<SFML.Window.Vector2f>>> results)
         {
-            results = new Dictionary<AABBProjectionSegment, Dictionary<AABBProjectionSegment, List<SFML.Window.Vector2f>>>();
+            results = new Dictionary<AABBProjectionSegmentEnum, Dictionary<AABBProjectionSegmentEnum, List<SFML.Window.Vector2f>>>();
 
             if (Start.Overlaps(other.Start))
                 return true;
 
             bool collisions = false;
-            
-            for (int currentLocalSegment = 0; currentLocalSegment < 4; currentLocalSegment++)
+
+            foreach (AABBProjectionSegment localSegment in PathSegments.Values)
             {
-                LineSegment currentLocal = PathSegments[currentLocalSegment];
-                results[(AABBProjectionSegment)currentLocalSegment] = new Dictionary<AABBProjectionSegment, List<SFML.Window.Vector2f>>();
-                for (int currentOtherSegment = 0; currentOtherSegment < 4; currentOtherSegment++)
+                results[localSegment.SegmentEnum] = new Dictionary<AABBProjectionSegmentEnum, List<SFML.Window.Vector2f>>();
+
+                foreach (AABBProjectionSegment otherSegment in other.PathSegments.Values)
                 {
-                    LineSegment currentOther = other.PathSegments[currentOtherSegment];
                     SFML.Window.Vector2f[] segmentIntersectionResults = null;
-                    results[(AABBProjectionSegment)currentLocalSegment][(AABBProjectionSegment)currentOtherSegment] = new List<SFML.Window.Vector2f>();
-                    if (currentLocal.CollidesWith(currentOther, out segmentIntersectionResults) && collisions == false)
+                    results[localSegment.SegmentEnum][otherSegment.SegmentEnum] = new List<SFML.Window.Vector2f>();
+                    if (localSegment.Path.CollidesWith(otherSegment.Path, out segmentIntersectionResults) && collisions == false)
                         collisions = true;
 
-                    results[(AABBProjectionSegment)currentLocalSegment][(AABBProjectionSegment)currentOtherSegment].AddRange(segmentIntersectionResults);
+                    results[localSegment.SegmentEnum][otherSegment.SegmentEnum].AddRange(segmentIntersectionResults);
                 }
             }
 
@@ -206,26 +245,22 @@ namespace CollisionLib
 
             bool collisions = false;
 
-            for (int currentLocalSegmentCounter = 0; currentLocalSegmentCounter < 4; currentLocalSegmentCounter++)
+            foreach (AABBProjectionSegment localSegment in PathSegments.Values)
             {
-                LineSegment currentLocal = PathSegments[currentLocalSegmentCounter];
-                AABBProjectionSegment currentLocalSegment = (AABBProjectionSegment)currentLocalSegmentCounter;
-                for (int currentOtherSegmentCounter = 0; currentOtherSegmentCounter < 4; currentOtherSegmentCounter++)
+                foreach (AABBProjectionSegment otherSegment in other.PathSegments.Values)
                 {
-                    LineSegment currentOther = other.PathSegments[currentOtherSegmentCounter];
                     SFML.Window.Vector2f[] segmentIntersectionResults = null;
-                    AABBProjectionSegment currentOtherSegment = (AABBProjectionSegment)currentOtherSegmentCounter;
 
-                    if (currentLocal.CollidesWith(currentOther, out segmentIntersectionResults) && collisions == false)
+                    if (localSegment.Path.CollidesWith(otherSegment.Path, out segmentIntersectionResults) && collisions == false)
                         collisions = true;
 
                     foreach (SFML.Window.Vector2f intersection in segmentIntersectionResults)
                     {
                         AABBProjectionCollisionResult aabbResult = new AABBProjectionCollisionResult();
                         aabbResult.CollisionPoint = intersection;
-                        aabbResult.Length = DistanceBetweenTwoPoints(currentLocal.Start, intersection);
-                        aabbResult.LocalSide = currentLocalSegment;
-                        aabbResult.OtherSide = currentOtherSegment;
+                        aabbResult.Length = DistanceBetweenTwoPoints(localSegment.Path.Start, intersection);
+                        aabbResult.LocalSide = localSegment.SegmentEnum;
+                        aabbResult.OtherSide = otherSegment.SegmentEnum;
 
                         results.Add(aabbResult);
                     }
@@ -245,9 +280,9 @@ namespace CollisionLib
 
         public void Draw(RenderTarget target, RenderStates states)
         {
-            foreach (LineSegment segment in PathSegments)
+            foreach (AABBProjectionSegment segment in PathSegments.Values)
             {
-                target.Draw(segment, states);
+                target.Draw(segment.Path, states);
             }
             target.Draw(End, states);
             target.Draw(Start, states);

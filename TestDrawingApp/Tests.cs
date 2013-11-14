@@ -96,8 +96,8 @@ namespace TestDrawingApp
             AABBProjection projection1 = new AABBProjection(box1, new SFML.Window.Vector2f(30.0f, -30.0f));
             AABBProjection projection2 = new AABBProjection(box2, new SFML.Window.Vector2f(30.0f, 30.0f));
 
-            Dictionary<AABBProjection.AABBProjectionSegment,
-                    Dictionary<AABBProjection.AABBProjectionSegment,
+            Dictionary<AABBProjection.AABBProjectionSegmentEnum,
+                    Dictionary<AABBProjection.AABBProjectionSegmentEnum,
                         List<SFML.Window.Vector2f>>> results = null;
 
             bool collisions = projection1.CollidesWith(projection2, out results);
@@ -108,7 +108,7 @@ namespace TestDrawingApp
             //Assert.IsTrue(collisions);
         }
 
-        public void TestAABBProjectionList()
+        public void AABBProjectionTestA()
         {
             AABB box1 = new AABB(new SFML.Window.Vector2f(50.0f, 300.0f), 50.0f, 50.0f, Color.Blue);
             AABB box2 = new AABB(new SFML.Window.Vector2f(650.0f, 100.0f), 50.0f, 50.0f, Color.Magenta);
@@ -116,45 +116,93 @@ namespace TestDrawingApp
             AABBProjection projection1 = new AABBProjection(box1, new SFML.Window.Vector2f(251.0f, -225.0f), Color.Cyan);
             AABBProjection projection2 = new AABBProjection(box2, new SFML.Window.Vector2f(-300.0f, 0.0f));
 
+            TestProjections(projection1, projection2);
+        }
+
+        public void AABBProjectionTestB()
+        {
+            AABB box1 = new AABB(new SFML.Window.Vector2f(150.0f, 100.0f), 50.0f, 50.0f, Color.Blue);
+            AABB box2 = new AABB(new SFML.Window.Vector2f(150.0f, 300.0f), 50.0f, 50.0f, Color.Magenta);
+
+            AABBProjection projection1 = new AABBProjection(box1, new SFML.Window.Vector2f(300.0f, 300.0f), Color.Cyan);
+            AABBProjection projection2 = new AABBProjection(box2, new SFML.Window.Vector2f(300.0f, -300.0f));
+
+            TestProjections(projection1, projection2);
+        }
+
+        public void AABBProjectionTestC()
+        {
+            AABB box1 = new AABB(new SFML.Window.Vector2f(150.0f, 100.0f), 50.0f, 50.0f, Color.Blue);
+            AABB box2 = new AABB(new SFML.Window.Vector2f(175.0f, 350.0f), 50.0f, 50.0f, Color.Magenta);
+
+            AABBProjection projection1 = new AABBProjection(box1, new SFML.Window.Vector2f(300.0f, 300.0f), Color.Cyan);
+            AABBProjection projection2 = new AABBProjection(box2, new SFML.Window.Vector2f(400.0f, -300.0f));
+
+            TestProjections(projection1, projection2);
+        }
+
+        public void AABBProjectionTestD()
+        {
+            AABB box1 = new AABB(new SFML.Window.Vector2f(150.0f, 100.0f), 50.0f, 50.0f, Color.Blue);
+            AABB box2 = new AABB(new SFML.Window.Vector2f(350.0f, 100.0f), 50.0f, 50.0f, Color.Magenta);
+
+            AABBProjection projection1 = new AABBProjection(box1, new SFML.Window.Vector2f(500.0f, 250.0f), Color.Cyan);
+            AABBProjection projection2 = new AABBProjection(box2, new SFML.Window.Vector2f(-250.0f, 300.0f));
+
+            TestProjections(projection1, projection2);
+        }
+
+        public void AABBProjectionTestE()
+        {
+            AABB box1 = new AABB(new SFML.Window.Vector2f(300.0f, 550.0f), 50.0f, 50.0f, Color.Blue);
+            AABB box2 = new AABB(new SFML.Window.Vector2f(340.0f, 300.0f), 50.0f, 50.0f, Color.Magenta);
+
+            AABBProjection projection1 = new AABBProjection(box1, new SFML.Window.Vector2f(0.0f, -249.0f), Color.Cyan);
+            AABBProjection projection2 = new AABBProjection(box2, new SFML.Window.Vector2f(1.0f, -1.0f));
+
+            TestProjections(projection1, projection2);
+        }
+
+        private void TestProjections(AABBProjection projection1, AABBProjection projection2)
+        {
             List<AABBProjection.AABBProjectionCollisionResult> results = null;
 
             bool collisions = projection1.CollidesWith(projection2, out results);
 
+            List<AABBProjection.AABBProjectionCollisionResult> sorted = null;
             if (collisions)
             {
-
-                List<AABBProjection.AABBProjectionCollisionResult> sorted = results.OrderBy(x => x.Length).ToList();
+                sorted = results.OrderBy(x => x.Length).ToList();
 
                 AABBProjection.AABBProjectionCollisionResult shortestResult = sorted[0];
 
-                AABBProjection.AABBProjectionSegment[] adjacentSegments = AABBProjection.GetAdjacentSegments(shortestResult.LocalSide);
+                AABBProjection.AABBProjectionSegmentEnum[] adjacentSegments = AABBProjection.GetAdjacentSegments(shortestResult.LocalSide);
 
                 List<AABBProjection.AABBProjectionCollisionResult> adjacentSegmentResults = sorted.Where(x => x.OtherSide == shortestResult.OtherSide && adjacentSegments.Contains(x.LocalSide)).OrderBy(x => x.Length).ToList();
 
                 if (adjacentSegmentResults.Count > 0)
                 {
+                    float shortestLength = adjacentSegmentResults[0].Length;
+                    //There could be multiples if we hit a corner
+                    adjacentSegmentResults = adjacentSegmentResults.Where(x => x.Length == shortestLength).ToList();
 
-                    AABBProjection.AABBProjectionCollisionResult shortestAdjacentResult = adjacentSegmentResults[0];
+                    foreach (AABBProjection.AABBProjectionCollisionResult collisionResult in adjacentSegmentResults)
+                    {
+                        AABB.AABBSide collisionSide = AABBProjection.GetSideFromProjectionSegments(shortestResult.LocalSide, collisionResult.LocalSide);
 
-                    AABB.AABBSide collisionSide = AABBProjection.GetSideFromProjectionSegments(shortestResult.LocalSide, shortestAdjacentResult.LocalSide);
+                        projection1.Start.Sides[(int)collisionSide].SetColor(Color.Red);
 
-                    box1.Sides[(int)collisionSide].SetColor(Color.Red);
+                        AABB.AABBSide otherCollisionSide = AABB.GetOppositeSide(collisionSide);
 
-                    AABB.AABBSide otherCollisionSide = AABB.GetOppositeSide(collisionSide);
-
-                    box2.Sides[(int)otherCollisionSide].SetColor(Color.Red);
-                }
-
-                foreach (AABBProjection.AABBProjectionCollisionResult result in sorted)
-                {
-                    window.Draw(result);
+                        projection2.Start.Sides[(int)otherCollisionSide].SetColor(Color.Red);
+                    }
                 }
 
                 //Draw our shortest line
-                CollisionLib.Shapes.XShape shortestStartingPointA = new CollisionLib.Shapes.XShape(projection1.PathSegments[(int)shortestResult.LocalSide].Start, 3.0f, Color.Yellow);
+                CollisionLib.Shapes.XShape shortestStartingPointA = new CollisionLib.Shapes.XShape(projection1.PathSegments[shortestResult.LocalSide].Path.Start, 3.0f, Color.Yellow);
                 window.Draw(shortestStartingPointA);
 
-                CollisionLib.Shapes.XShape shortestStartingPointB = new CollisionLib.Shapes.XShape(projection2.PathSegments[(int)shortestResult.OtherSide].Start, 3.0f, Color.Yellow);
+                CollisionLib.Shapes.XShape shortestStartingPointB = new CollisionLib.Shapes.XShape(projection2.PathSegments[shortestResult.OtherSide].Path.Start, 3.0f, Color.Yellow);
                 window.Draw(shortestStartingPointB);
             }
 
@@ -162,9 +210,11 @@ namespace TestDrawingApp
             window.Draw(projection1);
             window.Draw(projection2);
 
-            //Assert.IsTrue(collisions);
-
-            string debug = String.Empty;
+            if (sorted != null)
+            {
+                foreach (AABBProjection.AABBProjectionCollisionResult result in sorted)
+                    window.Draw(result);
+            }
         }
     }
 }
