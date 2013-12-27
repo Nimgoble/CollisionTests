@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SFML.Graphics;
+using SFML.Window;
 
 namespace CollisionLib
 {
@@ -48,38 +49,76 @@ namespace CollisionLib
         }
 
         public LineSegment[] Sides { get; set; }
-        public SFML.Window.Vector2f Position { get; set; }
+        private Vector2f position;
+        public SFML.Window.Vector2f Position 
+        {
+            get
+            {
+                return position;
+            }
+            set
+            {
+                position = value;
+                Configure();
+            }
+        }
         public SFML.Window.Vector2f Center { get; set; }
         public SFML.Window.Vector2f Extents { get; set; }
 
         public AABB(SFML.Window.Vector2f position, float width, float height)
         {
             Position = position;
-            Center = new SFML.Window.Vector2f(position.X + (width / 2), position.Y + (height / 2));
             Extents = new SFML.Window.Vector2f(width, height);
 
             this.color = Color.White;
 
-            Sides = new LineSegment[4];
-            Sides[(int)AABBSide.enTop] = new LineSegment(position, new SFML.Window.Vector2f(position.X + width, position.Y));
-            Sides[(int)AABBSide.enRight] = new LineSegment(Sides[(int)AABBSide.enTop].End, new SFML.Window.Vector2f(position.X + width, position.Y + height));
-            Sides[(int)AABBSide.enBottom] = new LineSegment(Sides[(int)AABBSide.enRight].End, new SFML.Window.Vector2f(position.X, position.Y + height));
-            Sides[(int)AABBSide.enLeft] = new LineSegment(Sides[(int)AABBSide.enBottom].End, position);
+            Configure();
         }
 
         public AABB(SFML.Window.Vector2f position, float width, float height, SFML.Graphics.Color color)
         {
             Position = position;
-            Center = new SFML.Window.Vector2f(position.X + (width / 2), position.Y + (height / 2));
             Extents = new SFML.Window.Vector2f(width, height);
+            this.color = color;
+
+            Configure();
+        }
+
+        public AABB(SFML.Window.Vector2f position, Vector2f extents)
+        {
+            Position = position;
+            Extents = extents;
+
+            this.color = Color.White;
+
+            Configure();
+        }
+
+        public AABB(SFML.Window.Vector2f position, Vector2f extents, Color color)
+        {
+            Position = position;
+            Extents = extents;
 
             this.color = color;
 
+            Configure();
+        }
+
+        public void Move(Vector2f movement)
+        {
+            this.Position += movement;
+            Configure();
+        }
+
+        private void Configure()
+        {
+            Center = new SFML.Window.Vector2f(position.X + (Extents.X / 2), position.Y + (Extents.Y / 2));
+
             Sides = new LineSegment[4];
-            Sides[(int)AABBSide.enTop] = new LineSegment(position, new SFML.Window.Vector2f(position.X + width, position.Y), color);
-            Sides[(int)AABBSide.enRight] = new LineSegment(Sides[(int)AABBSide.enTop].End, new SFML.Window.Vector2f(position.X + width, position.Y + height), color);
-            Sides[(int)AABBSide.enBottom] = new LineSegment(Sides[(int)AABBSide.enRight].End, new SFML.Window.Vector2f(position.X, position.Y + height), color);
-            Sides[(int)AABBSide.enLeft] = new LineSegment(Sides[(int)AABBSide.enBottom].End, position, color);
+            Sides[(int)AABBSide.enTop] = new LineSegment(Position, new SFML.Window.Vector2f(Position.X + Extents.X, Position.Y), color);
+            Sides[(int)AABBSide.enRight] = new LineSegment(Sides[(int)AABBSide.enTop].End, new SFML.Window.Vector2f(Position.X + Extents.X, Position.Y + Extents.Y), color);
+            Sides[(int)AABBSide.enBottom] = new LineSegment(Sides[(int)AABBSide.enRight].End, new SFML.Window.Vector2f(Position.X, Position.Y + Extents.Y), color);
+            Sides[(int)AABBSide.enLeft] = new LineSegment(Sides[(int)AABBSide.enBottom].End, Position, color);
         }
 
         public Boolean Overlaps(AABB other)

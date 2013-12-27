@@ -30,6 +30,9 @@ namespace TestDrawingApp
                 tests = new Tests(_window);
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
+
+                Stopwatch pauseWatch = new Stopwatch();
+                pauseWatch.Start();
                 while (_window.IsOpen())
                 {
                     _window.DispatchEvents();
@@ -42,12 +45,26 @@ namespace TestDrawingApp
                             --currentTest;
                             watch.Reset();
                             watch.Start();
+                            tests.TestCounter = 1;
+                            tests.Paused = false;
                         }
-                        else if (SFML.Window.Keyboard.IsKeyPressed(Keyboard.Key.Right) && currentTest < 5)
+                        else if (SFML.Window.Keyboard.IsKeyPressed(Keyboard.Key.Right) && currentTest < 6)
                         {
                             ++currentTest;
                             watch.Reset();
                             watch.Start();
+                            tests.TestCounter = 1;
+                            tests.Paused = false;
+                        }
+                    }
+
+                    if (pauseWatch.ElapsedMilliseconds > 250)
+                    {
+                        if (SFML.Window.Keyboard.IsKeyPressed(Keyboard.Key.Space))
+                        {
+                            tests.Paused = !tests.Paused;
+                            pauseWatch.Reset();
+                            pauseWatch.Start();
                         }
                     }
 
@@ -81,6 +98,9 @@ namespace TestDrawingApp
                         break;
                     case 4:
                         tests.AABBProjectionTestE();
+                        break;
+                    case 5:
+                        tests.SimulateWorld();
                         break;
                 }
             }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using CollisionLib;
 using SFML.Graphics;
-
+using SFML.Window;
 namespace TestDrawingApp
 {
     public class Tests
@@ -13,7 +13,13 @@ namespace TestDrawingApp
         public Tests(RenderWindow window)
         {
             this.window = window;
+            TestCounter = 1;
+            SetupSimulation();
+            Paused = false;
         }
+
+        public Int32 TestCounter { get; set; }
+        public Boolean Paused { get; set; }
 
         public void TestLineCollisionTrue()
         {
@@ -108,7 +114,7 @@ namespace TestDrawingApp
             //Assert.IsTrue(collisions);
         }
 
-        public void AABBProjectionTestA()
+        /*public void AABBProjectionTestA()
         {
             AABB box1 = new AABB(new SFML.Window.Vector2f(50.0f, 300.0f), 50.0f, 50.0f, Color.Blue);
             AABB box2 = new AABB(new SFML.Window.Vector2f(650.0f, 100.0f), 50.0f, 50.0f, Color.Magenta);
@@ -118,7 +124,6 @@ namespace TestDrawingApp
 
             TestProjections(projection1, projection2);
         }
-
         public void AABBProjectionTestB()
         {
             AABB box1 = new AABB(new SFML.Window.Vector2f(150.0f, 100.0f), 50.0f, 50.0f, Color.Blue);
@@ -162,7 +167,266 @@ namespace TestDrawingApp
 
             TestProjections(projection1, projection2);
         }
+         
+         */
 
+        public void AABBProjectionTestA()
+        {
+            float currentFrame = GetNextTestTime();
+            
+            Vector2f velocity1 = new SFML.Window.Vector2f(251.0f, -225.0f);
+            Vector2f velocity2 = new SFML.Window.Vector2f(-300.0f, 0.0f);
+            Vector2f startPosition1 = new Vector2f(50.0f, 300.0f) + (velocity1 * currentFrame);
+            Vector2f startPosition2 = new Vector2f(650.0f, 100.0f) + (velocity2 * currentFrame);
+
+            velocity1 = velocity1 - (velocity1 * currentFrame);
+            velocity2 = velocity2 - (velocity2 * currentFrame);
+
+            CollisionObject box1 = new CollisionObject(startPosition1, new Vector2f(50.0f, 50.0f), Color.Blue);
+            CollisionObject box2 = new CollisionObject(startPosition2, new Vector2f(50.0f, 50.0f), Color.Magenta);
+
+            box1.Velocity = velocity1;
+            box2.Velocity = velocity2;
+
+            CollisionResults results = CollisionManager.TestCollisions(box1, box2);
+
+            window.Draw(results);
+        }
+
+        public void AABBProjectionTestB()
+        {
+            float currentFrame = GetNextTestTime();
+
+            Vector2f velocity1 = new SFML.Window.Vector2f(300.0f, 300.0f);
+            Vector2f velocity2 = new SFML.Window.Vector2f(300.0f, -300.0f);
+            Vector2f startPosition1 = new Vector2f(150.0f, 100.0f) + (velocity1 * currentFrame);
+            Vector2f startPosition2 = new Vector2f(150.0f, 300.0f) + (velocity2 * currentFrame);
+
+            velocity1 = velocity1 - (velocity1 * currentFrame);
+            velocity2 = velocity2 - (velocity2 * currentFrame);
+
+            CollisionObject box1 = new CollisionObject(startPosition1, new Vector2f(50.0f, 50.0f), Color.Blue);
+            CollisionObject box2 = new CollisionObject(startPosition2, new Vector2f(50.0f, 50.0f), Color.Magenta);
+
+            box1.Velocity = velocity1;
+            box2.Velocity = velocity2;
+
+            CollisionResults results = CollisionManager.TestCollisions(box1, box2);
+            window.Draw(results);
+        }
+
+        public void AABBProjectionTestC()
+        {
+            float currentFrame = GetNextTestTime();
+
+            Vector2f velocity1 = new SFML.Window.Vector2f(300.0f, 300.0f);
+            Vector2f velocity2 = new SFML.Window.Vector2f(400.0f, -300.0f);
+            Vector2f startPosition1 = new SFML.Window.Vector2f(150.0f, 100.0f) + (velocity1 * currentFrame);
+            Vector2f startPosition2 = new SFML.Window.Vector2f(175.0f, 350.0f) + (velocity2 * currentFrame);
+
+            velocity1 = velocity1 - (velocity1 * currentFrame);
+            velocity2 = velocity2 - (velocity2 * currentFrame);
+            CollisionObject box1 = new CollisionObject(startPosition1, new Vector2f(50.0f, 50.0f), Color.Blue);
+            CollisionObject box2 = new CollisionObject(startPosition2, new Vector2f(50.0f, 50.0f), Color.Magenta);
+
+            box1.Velocity = velocity1;
+            box2.Velocity = velocity2;
+
+            CollisionResults results = CollisionManager.TestCollisions(box1, box2);
+            window.Draw(results);
+        }
+
+        public void AABBProjectionTestD()
+        {
+            float currentFrame = GetNextTestTime();
+
+            Vector2f velocity1 = new SFML.Window.Vector2f(500.0f, 250.0f);
+            Vector2f velocity2 = new SFML.Window.Vector2f(-250.0f, 300.0f);
+            Vector2f startPosition1 = new SFML.Window.Vector2f(150.0f, 100.0f) + (velocity1 * currentFrame);
+            Vector2f startPosition2 = new SFML.Window.Vector2f(350.0f, 100.0f) + (velocity2 * currentFrame);
+
+            velocity1 = velocity1 - (velocity1 * currentFrame);
+            velocity2 = velocity2 - (velocity2 * currentFrame);
+
+            CollisionObject box1 = new CollisionObject(startPosition1, new Vector2f(50.0f, 50.0f), Color.Blue);
+            CollisionObject box2 = new CollisionObject(startPosition2, new Vector2f(50.0f, 50.0f), Color.Magenta);
+
+            box1.Velocity = velocity1;
+            box2.Velocity = velocity2;
+
+            CollisionResults results = CollisionManager.TestCollisions(box1, box2);
+            window.Draw(results);
+        }
+
+        public void AABBProjectionTestE()
+        {
+            float currentFrame = GetNextTestTime();
+
+            Vector2f velocity1 = new SFML.Window.Vector2f(0.0f, -249.0f);
+            Vector2f velocity2 = new SFML.Window.Vector2f(1.0f, -1.0f);
+            Vector2f startPosition1 = new SFML.Window.Vector2f(300.0f, 550.0f) + (velocity1 * currentFrame);
+            Vector2f startPosition2 = new SFML.Window.Vector2f(340.0f, 300.0f) + (velocity2 * currentFrame);
+
+            velocity1 = velocity1 - (velocity1 * currentFrame);
+            velocity2 = velocity2 - (velocity2 * currentFrame);
+
+            CollisionObject box1 = new CollisionObject(startPosition1, new Vector2f(50.0f, 50.0f), Color.Blue);
+            CollisionObject box2 = new CollisionObject(startPosition2, new Vector2f(50.0f, 50.0f), Color.Magenta);
+
+            box1.Velocity = velocity1;
+            box2.Velocity = velocity2;
+
+            CollisionResults results = CollisionManager.TestCollisions(box1, box2);
+            window.Draw(results);
+        }
+
+        public float GetNextTestTime()
+        {
+            if (!Paused)
+                TestCounter = (TestCounter == 100000) ? 1 : TestCounter + 1;
+
+            return (TestCounter / 100000.0f);
+        }
+
+        private List<CollisionObject> simulatedObjects;
+        private CollisionObject simulationPlayer;
+        private void SetupSimulation()
+        {
+            simulatedObjects = new List<CollisionObject>()
+            {
+                new CollisionObject(new Vector2f(100.0f, 100.0f), new Vector2f(20.0f, 400.0f)), //left
+                new CollisionObject(new Vector2f(120.0f, 100.0f), new Vector2f(560.0f, 20.0f)), //top
+                new CollisionObject(new Vector2f(680.0f, 100.0f), new Vector2f(20.0f, 400.0f)), //right
+                new CollisionObject(new Vector2f(120.0f, 480.0f), new Vector2f(560.0f, 20.0f)) //bottom
+            };
+
+            simulationPlayer = new CollisionObject(new Vector2f(79.5f, 59.5f), new Vector2f(20.0f, 40.0f), Color.Cyan);
+            simulationPlayer.IsPlayer = true;
+            //simulationPlayer.Velocity = new Vector2f(0.5f, 1.0f);
+            simulatedObjects.Add(simulationPlayer);
+        }
+        public void SimulateWorld()
+        {
+            /*simulationPlayer.Velocity = new Vector2f(0.5f, 1.0f);
+            if (simulationPlayer.BoundingBox.Position.X > 250.0f || simulationPlayer.BoundingBox.Position.Y > 250.0f)
+            {
+                simulationPlayer.BoundingBox.Position = new Vector2f(70.5f, 60.5f);
+            }*/
+
+            if (SFML.Window.Keyboard.IsKeyPressed(Keyboard.Key.W))
+            {
+                simulationPlayer.Velocity = new Vector2f(simulationPlayer.Velocity.X, -0.5f);
+            }
+            else if (SFML.Window.Keyboard.IsKeyPressed(Keyboard.Key.S))
+            {
+                simulationPlayer.Velocity = new Vector2f(simulationPlayer.Velocity.X, 0.5f);
+            }
+            else
+            {
+                simulationPlayer.Velocity = new Vector2f(simulationPlayer.Velocity.X, 0.0f);
+            }
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.D))
+            {
+                simulationPlayer.Velocity = new Vector2f(0.5f, simulationPlayer.Velocity.Y);
+            }
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.A))
+            {
+                simulationPlayer.Velocity = new Vector2f(-0.5f, simulationPlayer.Velocity.Y);
+            }
+            else
+            {
+                simulationPlayer.Velocity = new Vector2f(0.0f, simulationPlayer.Velocity.Y);
+            }
+
+            //center the player
+            if (Keyboard.IsKeyPressed(Keyboard.Key.I))
+            {
+                simulationPlayer.Velocity = new Vector2f(79.5f - simulationPlayer.BoundingBox.Position.X, 59.5f - simulationPlayer.BoundingBox.Position.Y);
+                simulationPlayer.Move();
+                simulationPlayer.Velocity = new Vector2f();
+            }
+
+            Vector2f tempPosition = simulationPlayer.BoundingBox.Position + simulationPlayer.Velocity;
+            Vector2f testVector = new Vector2f(80.0f, 99.5f);
+            if (tempPosition.X == testVector.X && tempPosition.Y == testVector.Y)
+            {
+                int i = 0;
+            }
+
+            //Gravity
+            //simulationPlayer.Velocity = new Vector2f(simulationPlayer.Velocity.X, simulationPlayer.Velocity.Y + 0.5f);
+
+            foreach (CollisionObject collisionObject in simulatedObjects)
+            {
+                collisionObject.RevertToOriginalColor();
+            }
+
+            //Reset the colors and figure out collisions
+            /*for ( int i = 0; i < simulatedObjects.Count; i++ )
+            {
+                CollisionObject collisionObject = simulatedObjects[i];
+                for (int z = i + 1; z < simulatedObjects.Count; z++)
+                {
+                    CollisionObject otherObject = simulatedObjects[z];
+
+                    CollisionResults collisionResults = CollisionManager.TestCollisions(collisionObject, otherObject);
+
+                    if (collisionResults.Type != CollisionType.enNone)
+                    {
+                        collisionObject.OnCollision(collisionResults);
+                        otherObject.OnCollision(collisionResults);
+                    }
+                }
+            }*/
+
+            foreach (CollisionObject collisionObject in simulatedObjects)
+            {
+                if (collisionObject == simulationPlayer)
+                    continue;
+
+                CollisionResults results = CollisionManager.TestCollisions(simulationPlayer, collisionObject);
+
+                if (results.Type != CollisionType.enNone)
+                {
+                    simulationPlayer.OnCollision(results);
+                    collisionObject.OnCollision(results);
+                }
+            }
+
+            //Process collisions
+            foreach (CollisionObject collisionObject in simulatedObjects)
+            {
+                collisionObject.ProcessCollisions();
+            }
+
+            //Draw the objects.
+            foreach (CollisionObject collisionObject in simulatedObjects)
+            {
+                collisionObject.Move();
+                window.Draw(collisionObject);
+            }
+
+            foreach (CollisionObject collisionObject in simulatedObjects)
+            {
+                if (collisionObject == simulationPlayer)
+                    continue;
+
+                CollisionResults results = CollisionManager.TestCollisions(simulationPlayer, collisionObject);
+
+                if (results.Type == CollisionType.enAbsolute)
+                {
+                    int i = 0;
+                }
+            }
+
+            foreach (CollisionObject collisionObject in simulatedObjects)
+            {
+                collisionObject.PostFrame();
+            }
+        }
+
+        /*
         private void TestProjections(AABBProjection projection1, AABBProjection projection2)
         {
             List<AABBProjection.AABBProjectionCollisionResult> results = null;
@@ -216,5 +480,6 @@ namespace TestDrawingApp
                     window.Draw(result);
             }
         }
+        */
     }
 }

@@ -209,6 +209,25 @@ namespace CollisionLib
             }
         }
 
+        /*
+         * Collision should go like this:
+         * -Check if both starts are overlapping each other
+         * --If so: collision
+         * -Check if the projection segments collide
+         * --If so: 
+         * ---Find out the earliest collision point
+         * ----Project each AABB to that point in time and see if they overlap
+         * -----If not: no collision
+         * -----If so:
+         * ------Determine which sides will be colliding
+         * 
+         * What collision information we want:
+         * -What sides collided
+         * -What type of collision(predictive, absolute, none)
+         * -What objects collided
+         * -The time at which they collided
+         */ 
+
         public bool CollidesWith(AABBProjection other, out Dictionary<AABBProjectionSegmentEnum, Dictionary<AABBProjectionSegmentEnum, List<SFML.Window.Vector2f>>> results)
         {
             results = new Dictionary<AABBProjectionSegmentEnum, Dictionary<AABBProjectionSegmentEnum, List<SFML.Window.Vector2f>>>();
@@ -269,6 +288,34 @@ namespace CollisionLib
 
             return collisions;
         }
+
+        /*public List<CollisionResults> CollidesWith(AABBProjection other)
+        {
+            List<CollisionResults> results = new List<CollisionResults>();
+
+            if (Start.Overlaps(other.Start))
+            {
+                results.Add(new CollisionResults() { Type = CollisionType.enAbsolute });
+                return results;
+            }
+
+            if (End.Overlaps(other.End))
+            {
+                foreach (AABBProjectionSegment segment in PathSegments.Values)
+                {
+                    foreach (LineSegment otherSegment in other.End.Sides)
+                    {
+                        SFML.Window.Vector2f[] collisionPoints;
+                        bool collides = segment.Path.CollidesWith(otherSegment, out collisionPoints);
+                        if (collides)
+                        {
+
+                        }
+                    }
+                }
+            }
+            return results;
+        }*/
 
         private float DistanceBetweenTwoPoints(SFML.Window.Vector2f a, SFML.Window.Vector2f b)
         {
